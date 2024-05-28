@@ -7,6 +7,9 @@
 		- 4.5kW
 		- 3000 RPM
 		- Oil: SAE-10W30（above CC grade） 1.65L
+	- Starter Battery
+		- YTX20L-BS
+		- 18Ah
 	-T Mechanics
 		-T Clean it up
 		-T Solve fuel
