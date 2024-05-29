@@ -9,6 +9,7 @@ import re
 import inspect
 import getpass
 import waflib
+import glob
 
 ###############################################################################
 
