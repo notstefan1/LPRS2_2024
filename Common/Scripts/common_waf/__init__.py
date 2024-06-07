@@ -8,11 +8,8 @@ import sys
 import re
 import inspect
 import getpass
-import glob
-import fnmatch
-import shutil
-import datetime
 import waflib
+import glob
 
 ###############################################################################
 
@@ -165,79 +162,5 @@ def expand_app(app):
 		a = possible_a[0]
 		
 	return a
-
-###############################################################################
-# Backup stuff.
-
-def recursive_glob(pattern, directory = '.'):
-	for root, dirs, files in os.walk(directory, followlinks = True):
-		files_dirs = files + [d + '/' for d in dirs]
-		if pattern.startswith('/'):
-			if root != directory:
-				continue
-			else:
-				files_dirs = ['./' + fd for fd in files_dirs]
-		
-		rel_root = os.path.relpath(root, directory)
-		for fd in files_dirs:
-			for j in [fd, os.path.join(rel_root, fd)]:
-				if fnmatch.fnmatch(j, pattern):
-					yield os.path.join(root, fd)
-					break
-
-def collect_git_ignored_files():
-	#TODO Make tree and mark what is for delete, then mark what is not.
-	for gitignore in recursive_glob('.gitignore'):
-		with open(gitignore) as f:
-			base = os.path.dirname(gitignore)
-			
-			ignore_patterns = []
-			not_ignore_patterns = [] # Those starting with !
-			for pattern in f.readlines():
-				pattern = pattern.rstrip() # Remove new line stuff on line end.
-				if pattern.startswith('!'):
-					not_ignore_patterns.append(pattern[1:])
-				else:
-					ignore_patterns.append(pattern)
-			
-			not_ignore = set([])
-			for pattern in not_ignore_patterns:
-				for f in recursive_glob(pattern, base):
-					not_ignore.add(f)
-			for pattern in ignore_patterns:
-				for f in recursive_glob(pattern, base):
-					if f not in not_ignore:
-						yield f
-
-
-def distclean(ctx):
-	for fn in collect_git_ignored_files():
-		if os.path.isdir(fn):
-			shutil.rmtree(fn)
-		else:
-			os.remove(fn)
-
-def dist(ctx):
-	APPNAME = os.path.basename(os.getcwd())
-	now = datetime.datetime.now()
-	time_stamp = '{:d}-{:02d}-{:02d}-{:02d}-{:02d}-{:02d}'.format(
-		now.year,
-		now.month,
-		now.day,
-		now.hour,
-		now.minute,
-		now.second
-	)
-	ctx.arch_name = '../{}-{}.zip'.format(APPNAME, time_stamp)
-	ctx.algo = 'zip'
-	ctx.base_name = APPNAME
-	# Also pack git.
-	waflib.Node.exclude_regs = waflib.Node.exclude_regs.replace(
-'''
-**/.git
-**/.git/**
-**/.gitignore''', '')
-	# Ignore waf's stuff.
-	waflib.Node.exclude_regs += '\n**/.waf*'
 
 ###############################################################################

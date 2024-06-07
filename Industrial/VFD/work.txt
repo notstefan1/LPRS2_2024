@@ -1,0 +1,60 @@
+
+- VHD
+	- T13-750W-12-H
+		- Modbus ASCII
+		https://www.nvcnc.net/t13-400w-12-h-t13-750w-12h.html
+		https://www.nvcnc.net/wp-content/uploads/2021/11/mcu-t13-400w-12-h.pdf
+
+	- XSY-AT1
+		- Modbus ASCII
+
+- RS485
+	- Modbus ASCII
+		- https://en.wikipedia.org/wiki/Modbus#Modbus_ASCII
+		- https://www.fernhillsoftware.com/help/drivers/modbus/modbus-protocol.html
+		- Uppercase
+		- 1B start
+			- :
+		- 2B addr
+			- 01
+		- PDU
+			- https://www.fernhillsoftware.com/help/drivers/modbus/modbus-protocol.html#modbusPDU
+			- 2B fun code
+				- 03|04
+			- data
+				- 2B addr
+					- high b first
+					- 0000|0001
+				- 2B reg cnt
+					- high b first
+					- 0001
+		- 2B LRC
+			- Include: addr, PDU (fun, data)
+			- as raw B ie. 2B/2chars hex conv to UInt8
+			- https://en.wikipedia.org/wiki/Longitudinal_redundancy_check#Pseudocode
+		- 2B end
+			- CR LF
+			- \r\n
+			- 0D0A
+		- :010300000001FB\r\n
+	+- Modbus RTU
+		- https://en.wikipedia.org/wiki/Modbus#Modbus_RTU
+		- No idle between chars
+			- i.e. need 3.5 chars between packets
+		- Structure
+			- 1B addr
+				- 01
+			- PDU
+				- 1B fun code
+					- https://en.wikipedia.org/wiki/Modbus#Public_function_codes
+					- 03|04
+				- data
+					- 2B addr
+						- high b first
+						- 0000|0001
+					- 2B len
+						- high b first
+						- 0001|0002
+			- 2B CRC-16-MODBUS
+				- Low b first
+			- 01 03 0000 0001 

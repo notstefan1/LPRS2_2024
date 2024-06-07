@@ -1,0 +1,7 @@
+# KiCAD
+*bak
+*.bck
+fp-info-cache
+*.xml
+*.csv
+*.net
