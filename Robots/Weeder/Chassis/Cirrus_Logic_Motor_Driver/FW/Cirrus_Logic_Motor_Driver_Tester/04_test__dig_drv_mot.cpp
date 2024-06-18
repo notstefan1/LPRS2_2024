@@ -1,6 +1,9 @@
 
 #include "common.h"
 
+#define PWM_PERIOD 10000 //nanoseconds
+#define DUTY 0.999
+
 
 int main(void) {
 
@@ -31,29 +34,15 @@ int main(void) {
 		}else{
 			dig_drv.ul = 1;
 		}
-		if(v){
-			dig_drv.vh = 1;
-		}else{
-			dig_drv.vl = 1;
-		}
-		if(w){
-			dig_drv.wh = 1;
-		}else{
-			dig_drv.wl = 1;
-		}
+		
 	};
 
 	while(1){ //infinite loop
-
-		_delay_ms(6); //off
+		_delay_us(PWM_PERIOD * DUTY); 
 		u = 1;
-		edge();
-		_delay_ms(2); //on
+		edge(); 
+		_delay_us(PWM_PERIOD * (1 - DUTY));
 		u = 0;
 		edge();
-		
-
-		
 	}
-
 }
