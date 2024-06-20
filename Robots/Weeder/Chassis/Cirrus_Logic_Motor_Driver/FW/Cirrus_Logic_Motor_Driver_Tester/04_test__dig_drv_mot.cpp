@@ -11,6 +11,16 @@ int counterL = 0;
 int angleL = 0;
 int angleR = 0;
 
+volatile unsigned long previous = 0;
+volatile unsigned long timer1_millis = 0;
+
+unsigned long calculateRPM() {
+	unsigned long elapsed = timer1_millis - previous;
+	unsigned long RPM = 60000/elapsed;
+	previous = timer1_millis;
+	return RPM;
+}
+
 ISR(PCINT1_vect) {
     bool bela = (PINC & (1 << PC1));
     bool zelena = (PINC & (1 << PC0));  
@@ -22,7 +32,7 @@ ISR(PCINT1_vect) {
 			if(angleL >= 1000) {
 				counterL++;
 				angleL = 0;
-				Serial.println(counterL);
+				Serial.println(calculateRPM());
 			}
         } else {
             if(angleR >= GUARD) angleL = 0;
@@ -30,12 +40,15 @@ ISR(PCINT1_vect) {
 			if(angleR >= 1000) {
 				counterR++;
 				angleR = 0;
-				Serial.println(counterR);
+				Serial.println(calculateRPM());
 			}
         }
     }
 }
 
+ISR(TIMER1_COMPA_vect) {
+    timer1_millis++; 
+}
 
 int main(void) {
 	Serial.begin(115200);
@@ -51,6 +64,14 @@ int main(void) {
 
 	PCICR |= (1 << PCIE1);
     PCMSK1 |= (1 << PCINT9);
+
+	TCCR1A = 0; 
+    TCCR1B = 0;
+    TCCR1B |= (1 << WGM12);
+	TCCR1B |= (1 << CS11) | (1 << CS10); 
+    OCR1A = 250; 
+    TIMSK1 |= (1 << OCIE1A);
+
     sei();
 	
 	uint8_t u = 0;
