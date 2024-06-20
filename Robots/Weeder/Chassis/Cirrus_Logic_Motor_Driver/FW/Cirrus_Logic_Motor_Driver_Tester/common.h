@@ -1,7 +1,7 @@
 
 #pragma once
 
-
+#define __DELAY_BACKWARD_COMPATIBLE__
 #include <Arduino.h>
 
 #include <avr/io.h>
@@ -32,14 +32,14 @@ typedef union {
 		// GND
 		// Not used
 		// Not used
-		u8 dir     : 1; // PC0
-		u8 pls     : 1; // PC1
+		u8 zelena     : 1; // PC0
+		u8 bela		 : 1; // PC1
 		u8 : 6;
 		//u8 ddrc;
 		u8 ddr_in0  : 2; // PC0-1
 		u8 : 6;
 		//u8 portc;
-		u8 : 8;
+		u8 pc : 8;
 
 		//u8 pind;
 		u8 : 6;
